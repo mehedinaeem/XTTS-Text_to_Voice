@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}All Projects - AI Documentary Voice Studio{% endblock %}
+{% block page_title %}Projects Directory{% endblock %}
+
+{% block content %}
+<div class="glass-panel p-4 mb-4">
+    <div class="row g-3 justify-content-between align-items-center">
+        <!-- Search Form -->
+        <div class="col-md-6 col-lg-4">
+            <form method="GET" action="{% url 'projects:project_list' %}" class="input-group">
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}" class="form-control bg-dark border-secondary text-white" placeholder="Search projects by name..." aria-label="Search">
+                <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+        </div>
+        
+        <!-- Add project button -->
+        <div class="col-auto">
+            <a href="{% url 'projects:project_create' %}" class="btn btn-accent">
+                <i class="bi bi-folder-plus me-1"></i> New Project
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% if projects %}
+        {% for project in projects %}
+        <div class="col-md-6 col-lg-4">
+            <div class="glass-panel p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-bold text-white mb-0">{{ project.name }}</h5>
+                        <i class="bi bi-folder2 text-indigo fs-4"></i>
+                    </div>
+                    <p class="text-secondary small mb-4">
+                        {% if project.description %}
+                            {{ project.description|truncatewords:20 }}
+                        {% else %}
+                            No project description.
+                        {% endif %}
+                    </p>
+                </div>
+                
+                <div>
+                    <div class="d-flex justify-content-between border-top border-secondary-subtle pt-3 mb-3 small text-secondary">
+                        <span>Created: {{ project.created_at|date:"M d, Y" }}</span>
+                        <span>Audios: {{ project.generated_audios.count }}</span>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{% url 'projects:script_editor' project.id %}" class="btn btn-accent btn-sm flex-grow-1">
+                            <i class="bi bi-pencil-square"></i> Open Editor
+                        </a>
+                        <a href="{% url 'projects:project_edit' project.id %}" class="btn btn-outline-secondary btn-sm" title="Edit Settings">
+                            <i class="bi bi-gear"></i>
+                        </a>
+                        <a href="{% url 'projects:project_delete' project.id %}" class="btn btn-outline-danger btn-sm" title="Delete Project">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="glass-panel p-5 text-center text-secondary">
+                <i class="bi bi-search fs-1 mb-3 d-block text-indigo"></i>
+                <h4>No projects found</h4>
+                <p>Try modifying your search filter or add a new documentary project.</p>
+                <a href="{% url 'projects:project_create' %}" class="btn btn-accent btn-sm mt-2">Create Project</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Pagination (Optional but standard) -->
+{% if is_paginated %}
+<nav class="mt-4" aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link bg-dark border-secondary text-white" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+        {% endif %}
+        <li class="page-item active">
+            <span class="page-link bg-indigo border-indigo text-white">{{ page_obj.number }}</span>
+        </li>
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link bg-dark border-secondary text-white" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

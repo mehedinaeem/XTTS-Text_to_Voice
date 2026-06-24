@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AI Documentary Voice Studio{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<!-- Metrics cards row -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="glass-panel metric-card p-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase text-secondary fw-semibold mb-1 small">Total Projects</h6>
+                    <h2 class="display-6 fw-bold mb-0 text-white">{{ total_projects }}</h2>
+                </div>
+                <div class="bg-indigo bg-opacity-10 p-3 rounded-3 text-indigo fs-2">
+                    <i class="bi bi-folder2-open"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="glass-panel metric-card p-4" style="border-left-color: #10b981;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase text-secondary fw-semibold mb-1 small">Total Audio Generated</h6>
+                    <h2 class="display-6 fw-bold mb-0 text-white">{{ total_duration|floatformat:1 }}s</h2>
+                </div>
+                <div class="bg-success bg-opacity-10 p-3 rounded-3 text-success fs-2">
+                    <i class="bi bi-music-note-beamed"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="glass-panel metric-card p-4" style="border-left-color: #ef4444;">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-uppercase text-secondary fw-semibold mb-1 small">Failed Runs</h6>
+                    <h2 class="display-6 fw-bold mb-0 text-white">{{ failed_generations }}</h2>
+                </div>
+                <div class="bg-danger bg-opacity-10 p-3 rounded-3 text-danger fs-2">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Recent Projects -->
+    <div class="col-lg-6">
+        <div class="glass-panel p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title mb-0 fw-bold">Recent Projects</h5>
+                <a href="{% url 'projects:project_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+            </div>
+            
+            {% if recent_projects %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small">
+                            <th>Name</th>
+                            <th>Created At</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in recent_projects %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'projects:script_editor' project.id %}" class="text-white text-decoration-none fw-semibold">
+                                    {{ project.name }}
+                                </a>
+                            </td>
+                            <td class="text-secondary small">{{ project.created_at|date:"M d, Y" }}</td>
+                            <td class="text-end">
+                                <a href="{% url 'projects:script_editor' project.id %}" class="btn btn-sm btn-accent">
+                                    <i class="bi bi-pencil-square"></i> Open
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-folder-plus fs-1 mb-3 d-block"></i>
+                <p class="mb-3">No projects created yet.</p>
+                <a href="{% url 'projects:project_create' %}" class="btn btn-accent btn-sm">Create New Project</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Generations -->
+    <div class="col-lg-6">
+        <div class="glass-panel p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title mb-0 fw-bold">Recent Audio Runs</h5>
+            </div>
+            
+            {% if recent_generations %}
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small">
+                            <th>Project</th>
+                            <th>Speaker</th>
+                            <th>Status</th>
+                            <th>Preview</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for audio in recent_generations %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'projects:script_editor' audio.project.id %}" class="text-white text-decoration-none">
+                                    {{ audio.project.name }}
+                                </a>
+                            </td>
+                            <td><span class="badge bg-secondary">{{ audio.speaker }}</span></td>
+                            <td>
+                                {% if audio.status == 'COMPLETED' %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">Success</span>
+                                {% elif audio.status == 'PROCESSING' %}
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle spinner-grow spinner-grow-sm"></span>
+                                {% elif audio.status == 'FAILED' %}
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Failed</span>
+                                {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Queued</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if audio.audio_file %}
+                                <audio src="{{ audio.audio_file.url }}" controls class="w-100" style="max-width: 150px; height: 28px;"></audio>
+                                {% else %}
+                                <span class="text-secondary small">--</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-music-note fs-1 mb-3 d-block"></i>
+                <p>No audio files generated yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

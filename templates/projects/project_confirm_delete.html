@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Project - AI Documentary Voice Studio{% endblock %}
+{% block page_title %}Delete Confirmation{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="glass-panel p-4 border border-danger">
+            <h5 class="fw-bold mb-3 text-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Confirm Project Deletion
+            </h5>
+            <p class="text-secondary">
+                Are you sure you want to permanently delete the project <strong class="text-white">"{{ object.name }}"</strong>?
+            </p>
+            <p class="text-danger small">
+                Warning: This will also delete all associated script drafts, settings, and generated audio output files from disk. This action cannot be undone.
+            </p>
+            
+            <form method="POST" class="d-flex justify-content-end gap-2 border-top border-secondary-subtle pt-3">
+                {% csrf_token %}
+                <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-danger px-4">Delete Permanently</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

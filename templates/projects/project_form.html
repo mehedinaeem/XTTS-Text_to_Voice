@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Edit {{ object.name }}{% else %}New Project{% endif %} - AI Documentary Voice Studio
+{% endblock %}
+
+{% block page_title %}
+    {% if object %}Configure Project{% else %}Start New Project{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="glass-panel p-4">
+            <h5 class="fw-bold mb-4 text-white">
+                <i class="bi bi-folder-plus text-indigo me-2"></i>
+                {% if object %}Update project configurations{% else %}Create new documentary workspace{% endif %}
+            </h5>
+            
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_name" class="form-label text-secondary fw-semibold small">Project Name</label>
+                    <input type="text" name="name" id="id_name" class="form-control bg-dark border-secondary text-white py-2" value="{{ form.name.value|default:'' }}" required placeholder="e.g. Apollo 11 Documentary">
+                    {% if form.name.errors %}
+                        <div class="text-danger small mt-1">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-4">
+                    <label for="id_description" class="form-label text-secondary fw-semibold small">Project Description (Optional)</label>
+                    <textarea name="description" id="id_description" rows="4" class="form-control bg-dark border-secondary text-white" placeholder="Summarize the voice goals or target channels for this documentary.">{{ form.description.value|default:'' }}</textarea>
+                    {% if form.description.errors %}
+                        <div class="text-danger small mt-1">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2 border-top border-secondary-subtle pt-3">
+                    <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-accent px-4">
+                        {% if object %}Save Settings{% else %}Create Project{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
